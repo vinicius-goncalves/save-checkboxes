@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box }
+
+:root {
+
+    --color0: #0D0D0D;
+    --color1: #404040;
+    --color2: #8C8C8C;
+    --color3: #BFBFBF;
+    --color4: #F2F2F2;
+    
+    font-family: 'Open Sans';
+    font-size: 17px;
+    
+    color: var(--color4)
+
+}
+
+body {
+    background-color: var(--color0);
+    overflow: hidden;
+}
+
+header {
+    text-align: center;
+    margin: 15px;
+    font-size: 2rem;
+}
+
+.main-checkboxes {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.checkbox-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 30px;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    width: 64px;
+    height: 48px;
+    border: 1px solid var(--color3);
+    appearance: none;
+    position: relative;
+    cursor: pointer;
+}
+
+.checkbox-wrapper input[type="checkbox"]::before {
+    content: "";
+    width: 48px;
+    height: 48px;
+    background-color: var(--color4);
+    position: absolute;
+    left: -7px;
+    top: -7px;
+    transform: scale(0);
+    transition: transform 200ms;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+.checkbox-wrapper span {
+    font-size: 1.5rem;
+    width: 100%;
+    margin: 10px;
+}
+
+footer {
+    position: absolute;
+    bottom: 25px;
+    left: 25px;
+}
+
+footer a {
+    color: var(--color2);
+    text-decoration: none;
+}
+
+@media screen and (max-width: 600px) {
+    header {
+        word-break: break-all;
+        font-size: 1.2rem;
+        margin-top: 25px;
+    }
+
+    .checkbox-wrapper {
+        padding: 10px;
+    }
+
+    .checkbox-wrapper input[type="checkbox"]:checked::before {
+        width: 32px;
+        height: 48px;
+    }
+
+    .checkbox-wrapper span {
+        font-size: 1rem;
+    }
+}
