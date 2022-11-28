@@ -1,4 +1,4 @@
-export { Checkbox, CheckboxManager }
+export { Checkbox, CheckboxDataCache, CheckboxManager, CheckboxStored }
  
 const STORE_NAME = 'checkboxes'
 const STORE_VERSION = 1
@@ -12,7 +12,7 @@ const dbPromise = new Promise(resolve => {
     
         const dbResult = event.target.result
         if(!dbResult.objectStoreNames.contains('saved-checkboxes')) {
-            const store = dbResult.createObjectStore('saved-checkboxes', { autoIncrement: true })
+            const store = dbResult.createObjectStore('saved-checkboxes', { keyPath: 'id' })
             store.createIndex('checkboxIndex', 'id', { unique: true })
         }
     })
@@ -40,12 +40,80 @@ function Checkbox(id, checkDate) {
     this.checkDate = checkDate
 }
 
+function CheckboxStored(textNodeContent) {
+    this.textNodeContent = textNodeContent
+}
+
 function CheckboxManager () {
-    this.saveCheckbox = function saveCheckbox(id) {
+
+    this.getCheckbox = function getCheckbox(id, callback) {
 
         makeTransaction(OBJECT_STORE_NAME, store => {
-            console.log(store)
+        
+            const query = store.get(id)
+            query.addEventListener('success', (event) => {
+                callback(event.target.result)
+            })
         })
+    }
 
+    this.saveCheckbox = function saveCheckbox(checkboxObj) {
+
+        makeTransaction(OBJECT_STORE_NAME, store => {
+            store.put(checkboxObj).addEventListener('success', () => {
+                this.getCheckbox(checkboxObj.id, checkboxAdded => {
+                    return checkboxAdded
+                })
+            })
+        }, 'readwrite')
+    }
+
+    this.getAllItems = function(callback) {
+        makeTransaction(OBJECT_STORE_NAME, store => {
+            store.getAll().addEventListener('success', (event) => {
+                callback(event.target.result)
+            })
+        })
+    }
+
+    this.deleteCheckbox = function(id) {
+        makeTransaction(OBJECT_STORE_NAME, store => {
+            
+            const openedCursor = store.openCursor()
+            openedCursor.addEventListener('success', (event) => {
+                
+                const cursor = event.target.result
+                if(!cursor) {
+                    return console.log('Finished')
+                }
+                
+                if(cursor.value.id == id) {
+                    cursor.delete().addEventListener('success', () => {
+                        console.info(`[!!] Checkbox "${id}" was deleted.`)
+                        return
+                    })
+                }
+
+                cursor.continue()
+                
+            })
+        }, 'readwrite')
+    }
+}
+
+function CheckboxDataCache() {
+
+    this.startCache = function(callback) {
+        caches.open('checkboxes').then(cache => {
+            callback(cache)
+        })
+    }
+
+    this.findCheckbox = function(id, callback) {
+        this.startCache(cache => {
+            cache.match(id).then(result => {
+                callback(result)
+            })
+        })
     }
 }

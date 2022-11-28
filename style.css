@@ -10,10 +10,10 @@
     --color3: #BFBFBF;
     --color4: #F2F2F2;
     
-    font-family: 'Open Sans';
+    font-family: 'Open Sans', Arial, sans-serif;
     font-size: 17px;
     
-    color: var(--color4)
+    color: var(--color4);
 
 }
 
@@ -26,6 +26,21 @@ header {
     text-align: center;
     margin: 15px;
     font-size: 2rem;
+}
+
+header .add-checkbox {
+    background-color: transparent;
+    border: 1px solid var(--color4);
+    color: var(--color4);
+    font-size: 2rem;
+    padding: 5px;
+    transition: padding 200ms, border-radius 200ms;
+}
+
+header .add-checkbox:hover {
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 7px;
 }
 
 .main-checkboxes {
