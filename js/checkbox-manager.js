@@ -1,3 +1,4 @@
+import { getFactorial, randomID } from './utils.js'
 export { Checkbox, CheckboxDataCache, CheckboxManager, CheckboxCreator }
  
 const STORE_NAME = 'checkboxes'
@@ -105,6 +106,7 @@ function CheckboxManager () {
 function CheckboxDataCache() {
 
     CheckboxDataCache.globalFlag = false
+    CheckboxDataCache.loopAttemps = 0
 
     function requestLink(id) { 
         return `${window.origin}/checkboxes/${String(id)}.json`
@@ -148,18 +150,21 @@ function CheckboxDataCache() {
 
                 CheckboxDataCache.globalFlag = true
                 await cache.put(request, response)
-                console.log(`Created checkbox with ${CheckboxDataCache.currentID} at ${Date.now()}`)
+                console.log(`Created checkbox with ID ${CheckboxDataCache.currentID} at ${Date.now()}`)
                 return
 
             }
+
+            if(CheckboxDataCache.loopAttemps > getFactorial(CheckboxDataCache.currentID.length) || CheckboxDataCache.loopAttemps > Number.MAX_SAFE_INTEGER) {
+                console.log('The attemps was filled up, breaked')
+                break
+            }
             
-            console.log('Exists, trying again...')
-            CheckboxDataCache.currentID = Math.floor(Math.random() * 5)
+            console.log(`An checkbox with ID ${CheckboxDataCache.currentID} already exists`)
+            CheckboxDataCache.currentID = randomID(6)
             CheckboxDataCache.globalFlag = false
+            CheckboxDataCache.loopAttemps++
 
         } while(!CheckboxDataCache.globalFlag)
     }
 }
-
-const x = new CheckboxDataCache()
-x.putCheckbox(new CheckboxCreator(Math.floor(Math.random() * 5)))

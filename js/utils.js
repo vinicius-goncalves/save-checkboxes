@@ -1,4 +1,4 @@
-export { randomID }
+export { randomID, getFactorial }
 
 function getChar(type) {
 
@@ -49,4 +49,11 @@ function randomUUID() {
         return (char === 'x' ? random : (random & 0x3 | 0x8)).toString(16)  
     })
     return uuid
+}
+
+function getFactorial(number) {
+    if(number !== 1) {
+        return getFactorial(number - 1) * number
+    }
+    return 1
 }
