@@ -1,4 +1,4 @@
-import { Checkbox, CheckboxManager, CheckboxStored, CheckboxDataCache } from './checkbox-manager.js'
+import { Checkbox, CheckboxManager, CheckboxDataCache } from './checkbox-manager.js'
 import { randomID } from './utils.js'
 
 const docBody = document.body

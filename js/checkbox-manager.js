@@ -1,4 +1,4 @@
-export { Checkbox, CheckboxDataCache, CheckboxManager, CheckboxStored }
+export { Checkbox, CheckboxDataCache, CheckboxManager, CheckboxCreator }
  
 const STORE_NAME = 'checkboxes'
 const STORE_VERSION = 1
@@ -40,8 +40,9 @@ function Checkbox(id, checkDate) {
     this.checkDate = checkDate
 }
 
-function CheckboxStored(textNodeContent) {
-    this.textNodeContent = textNodeContent
+function CheckboxCreator(id) {
+    this.id = id
+    this.createdWhen = Date.now()
 }
 
 function CheckboxManager () {
@@ -103,17 +104,62 @@ function CheckboxManager () {
 
 function CheckboxDataCache() {
 
-    this.startCache = function(callback) {
-        caches.open('checkboxes').then(cache => {
-            callback(cache)
-        })
+    CheckboxDataCache.globalFlag = false
+
+    function requestLink(id) { 
+        return `${window.origin}/checkboxes/${String(id)}.json`
     }
 
-    this.findCheckbox = function(id, callback) {
-        this.startCache(cache => {
-            cache.match(id).then(result => {
-                callback(result)
-            })
-        })
+    this.startCache = async function() {
+        const cache = await caches.open('checkboxes')
+        return cache
+    }
+    
+    this.findCheckbox = async function(id) {
+        const cache = await this.startCache()
+        const cacheMatched = await cache.match(new Request(`${window.origin}/checkboxes/${id}.json`))
+        if(!cacheMatched || !cacheMatched.ok) { return }
+        const checkboxObject = await cacheMatched.json()
+        return checkboxObject
+    }
+    
+    this.putCheckbox = async function(checkboxObj) {
+        
+        CheckboxDataCache.currentID = checkboxObj.id
+        
+        do {
+
+            const cacheFound = await this.findCheckbox(CheckboxDataCache.currentID)
+
+            if(!cacheFound) {
+
+                const cache = await this.startCache()
+                const hds = new Headers({
+                    'Content-Type': 'application/json',
+                    'Content-Length': JSON.stringify(checkboxObj).length / 1024
+                })
+
+                const request = new Request(requestLink(CheckboxDataCache.currentID), { headers: hds } )
+                const response = new Response(JSON.stringify(checkboxObj), { 
+                    headers: hds,
+                    status: 200,
+                    statusText: 'Ok'
+                })
+
+                CheckboxDataCache.globalFlag = true
+                await cache.put(request, response)
+                console.log(`Created checkbox with ${CheckboxDataCache.currentID} at ${Date.now()}`)
+                return
+
+            }
+            
+            console.log('Exists, trying again...')
+            CheckboxDataCache.currentID = Math.floor(Math.random() * 5)
+            CheckboxDataCache.globalFlag = false
+
+        } while(!CheckboxDataCache.globalFlag)
     }
 }
+
+const x = new CheckboxDataCache()
+x.putCheckbox(new CheckboxCreator(Math.floor(Math.random() * 5)))
