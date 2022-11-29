@@ -150,9 +150,11 @@ function CheckboxDataCache() {
 
                 CheckboxDataCache.globalFlag = true
                 await cache.put(request, response)
-                console.log(`Created checkbox with ID ${CheckboxDataCache.currentID} at ${Date.now()}`)
-                return
-
+                return {
+                    created: true,
+                    identify: CheckboxDataCache.currentID,
+                    finishedWhen: Date.now()
+                }
             }
 
             if(CheckboxDataCache.loopAttemps > getFactorial(CheckboxDataCache.currentID.length) || CheckboxDataCache.loopAttemps > Number.MAX_SAFE_INTEGER) {

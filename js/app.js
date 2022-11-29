@@ -1,4 +1,4 @@
-import { Checkbox, CheckboxManager, CheckboxDataCache } from './checkbox-manager.js'
+import { Checkbox, CheckboxManager, CheckboxDataCache, CheckboxCreator } from './checkbox-manager.js'
 import { randomID } from './utils.js'
 
 const docBody = document.body
@@ -8,7 +8,20 @@ const addCheckboxButton = document.querySelector('.add-checkbox')
 const checkboxManager = new CheckboxManager()
 const checkboxDataCache = new CheckboxDataCache()
 
+function initializeMutationObserver() {
+    
+    const mutation = new MutationObserver(mutations => {
+        console.log(mutations)
+    })
+
+    mutation.observe(mainCheckboxes, {
+        childList: true,
+    })
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+    
+    initializeMutationObserver()
     
     const script = document.createElement('script')
     script.setAttribute('src', 'js/checkbox-manager.js')
@@ -24,26 +37,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
 addCheckboxButton.addEventListener('click', () => {
     
-    const newID = String(randomID(16))
-    checkboxDataCache.findCheckbox(newID)
 
-    // const label = document.createElement('label')
-    // label.setAttribute('class', 'checkbox-wrapper')
+    // <label class="checkbox-wrapper" data-id="1">
+    //             <input type="checkbox">
+    //             <span class="checkbox-span">Check me!</span>
+    //         </label>
 
-    // const input = document.createElement('input')
-    // input.setAttribute('type', 'checkbox')
-    // input.setAttribute('data-id', newID)
+    const id = randomID(5)
+    const checkbox = new CheckboxCreator(id)
+    checkboxDataCache.putCheckbox(checkbox).then(result => {
+        const { created, identify } = result
+        if(created) {
+            
+            const label = document.createElement('label')
+            label.setAttribute('class', 'checkbox-wrapper')
+            label.setAttribute('data-id', String(identify))
 
-    // const span = document.createElement('span')
-    // const textNodeContent = document.createTextNode(newID)
-    // span.appendChild(textNodeContent)
+            const input = document.createElement('input')
+            input.setAttribute('type', 'checkbox')
+            
+            const span = document.createElement('span')
+            span.setAttribute('class', 'checkbox-span')
 
-    // label.append(input, span)
-    
-    // mainCheckboxes.insertAdjacentElement('beforeend', label)
+            const textNode = document.createTextNode(identify)
+            span.appendChild(textNode)
 
+            label.append(input, span)
+
+            mainCheckboxes.appendChild(label)
+
+        }
+    })
 })
-
 
 mainCheckboxes.addEventListener('click', (event) => {
 
