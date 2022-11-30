@@ -100,3 +100,9 @@ mainCheckboxes.addEventListener('click', (event) => {
         }
     })
 })
+
+window.addEventListener('resize', (event) => {
+    if(document.documentElement.clientWidth < 401) {
+        console.log('Use mouse swap feature...')
+    }
+})
