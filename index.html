@@ -6,23 +6,28 @@
         <link rel="shortcut icon" href="data/favicon.png" type="image/x-icon">
     </head>
     <body>
+        <div class="scrollbar">
+            <div class="scrollbar-content"></div>
+        </div>
         <header>
             <h1>Save Checkboxes</h1>
             <input type="button" class="add-checkbox" value="New checkbox">
         </header>
         <div class="main-checkboxes">
-            <label class="checkbox-wrapper" data-id="1">
-                <input type="checkbox">
-                <span class="checkbox-span">Check me!</span>
-            </label>
-            <label class="checkbox-wrapper" data-id="2">
-                <input type="checkbox">
-                <span class="checkbox-span">Check me too!</span>
-            </label>
-            <label class="checkbox-wrapper" data-id="3">
-                <input type="checkbox">
-                <span class="checkbox-span">Hey! Don't forget me...</span>
-            </label>
+            <div class="checkboxes">
+                <label class="checkbox-wrapper" data-id="1">
+                    <input type="checkbox">
+                    <span class="checkbox-span">Check me!</span>
+                </label>
+                <label class="checkbox-wrapper" data-id="2">
+                    <input type="checkbox">
+                    <span class="checkbox-span">Check me too!</span>
+                </label>
+                <label class="checkbox-wrapper" data-id="3">
+                    <input type="checkbox">
+                    <span class="checkbox-span">Hey! Don't forget me...</span>
+                </label>
+            </div>
         </div>
         <footer>For more projects, go to <a href="https://github.com/vinicius-goncalves" target="_blank" rel="external">Vinícius Gonçalves' Github</a></footer>
         <script src="js/app.js" type="module"></script>

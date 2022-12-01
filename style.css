@@ -22,6 +22,29 @@ body {
     overflow: hidden;
 }
 
+.scrollbar {
+    width: 100%;
+    height: 5px;
+    background-color: var(--color4);
+}
+
+.scrollbar-content {
+    transition: width 200ms;
+    height: inherit;
+    width: 0;
+    background-color: var(--color1);
+}
+
+/* .scrollbar::before {
+    content: "";
+    width: var(--curr-width);
+    height: inherit;
+    background-color: red;
+    position: absolute;
+    top: 0;
+    transition: width 200ms;
+} */
+
 header {
     text-align: center;
     margin: 15px;
@@ -48,8 +71,8 @@ header .add-checkbox:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-height: 350px;
-    overflow-y: auto;
+    max-height: 345px;
+    overflow: auto;
 }
 
 .main-checkboxes::-webkit-scrollbar {
@@ -58,16 +81,17 @@ header .add-checkbox:hover {
     border: transparent;
     width: 5px;
     border-radius: 10px;
-}
-
-.main-checkboxes::-webkit-scrollbar-thumb {
-    background-color: var(--color2);
-    border-radius: 10px;
-    transition: background-color 200ms;
+    overflow: hidden;
 }
 
 .main-checkboxes::-webkit-scrollbar-thumb {
     background-color: var(--color1);
+    border-radius: 10px;
+    transition: background-color 200ms;
+}
+
+.main-checkboxes::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color2);
 }
 
 .checkbox-wrapper {
@@ -106,6 +130,10 @@ header .add-checkbox:hover {
     font-size: 1.5rem;
     width: 100%;
     margin: 10px;
+}
+
+.main-checkboxes input[type="checkbox"]:disabled + span {
+    opacity: .5;
 }
 
 footer {
@@ -168,7 +196,7 @@ footer a {
 
     .main-checkboxes {
         margin: 10px;
-        top: 40%;
+        top: 47%;
         overflow: hidden;
     }
 

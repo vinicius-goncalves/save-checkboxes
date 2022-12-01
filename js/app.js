@@ -36,12 +36,6 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 addCheckboxButton.addEventListener('click', () => {
-    
-
-    // <label class="checkbox-wrapper" data-id="1">
-    //             <input type="checkbox">
-    //             <span class="checkbox-span">Check me!</span>
-    //         </label>
 
     const id = randomID(5)
     const checkbox = new CheckboxCreator(id)
@@ -85,7 +79,7 @@ mainCheckboxes.addEventListener('click', (event) => {
 
     checkboxManager.getCheckbox(id, result => {
 
-        if(typeof result !== 'undefined' && !targetClicked.checked) {
+        if(typeof result !== 'undefined') {
             checkboxManager.deleteCheckbox(id)
             return
         }
@@ -101,8 +95,53 @@ mainCheckboxes.addEventListener('click', (event) => {
     })
 })
 
-window.addEventListener('resize', (event) => {
+window.addEventListener('resize', () => {
     if(document.documentElement.clientWidth < 401) {
         console.log('Use mouse swap feature...')
     }
+})
+
+var isSwapping = false 
+let coordY = 0
+let prevScrollTop = 0
+
+mainCheckboxes.addEventListener('mousedown', (event) => {
+    
+    if(!isSwapping) {
+
+        document.documentElement.style.setProperty('user-select', 'none')
+        event.preventDefault()
+        isSwapping = true
+
+        prevScrollTop = mainCheckboxes.scrollTop
+        coordY = event.clientY
+
+        return
+    }
+})
+
+window.addEventListener('mousemove', (event) => {
+    if(isSwapping) {
+        mainCheckboxes.scrollTop = prevScrollTop - (event.clientY - coordY)
+        return
+    }
+})
+
+window.addEventListener('mouseup', () => {
+    if(isSwapping) {
+        
+        isSwapping = false
+        document.documentElement.style.removeProperty('user-select')
+
+        return
+    }
+})
+
+mainCheckboxes.addEventListener('scroll', () => {
+    
+    const scrollTop = mainCheckboxes.scrollTop || 0
+    const clientHeight = mainCheckboxes.scrollHeight - mainCheckboxes.clientHeight
+    const percetange = (scrollTop / clientHeight) * 100
+    document.querySelector('.scrollbar-content').style.width = `${percetange}%`
+
 })
