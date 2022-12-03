@@ -169,4 +169,19 @@ function CheckboxDataCache() {
 
         } while(!CheckboxDataCache.globalFlag)
     }
+
+    this.getAllCheckboxes = async function(callback) {
+        
+        try {
+
+            const cache = await this.startCache()
+            const allMatches = await cache.matchAll()
+            const promises = allMatches.map(responseObj => responseObj.json())
+            const promisesResolved = await Promise.all(promises)
+            callback(promisesResolved)
+    
+        } catch (error) {
+
+        }
+    }
 }

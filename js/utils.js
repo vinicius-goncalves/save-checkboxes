@@ -56,4 +56,49 @@ function getFactorial(number) {
         return getFactorial(number - 1) * number
     }
     return 1
+} 
+
+/** 
+* Create a new DOM element
+* @param {object} elementObj - An object with the element details 
+*
+*
+*
+*/
+
+const obj = {
+    div: {
+        width: '325px',
+        height: '325px',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        'z-index': 25,
+        style: {
+            backgroundColor: '#ff00ff',
+            color: '#ffffff'
+        }
+    }
+}
+
+export function createElement(elementObj) {
+    
+    const elementToCreate = Object.keys(elementObj)[0]
+    const elementAttributes = Object.values(elementObj)[0]
+
+    const el = document.createElement(elementToCreate)
+
+    for(let attribute in elementAttributes) {
+        
+        const attributeValue = elementAttributes[attribute]
+        el.setAttribute(attribute, attributeValue)
+        
+        if(attribute.indexOf('style') >= 0) {
+            for(let styleProperty in attributeValue) {
+                el.style.setProperty(styleProperty, attributeValue[styleProperty])
+            }
+        }
+    }
+    
+    return el
 }
