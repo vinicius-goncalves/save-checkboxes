@@ -102,3 +102,26 @@ export function createElement(elementObj) {
     
     return el
 }
+
+function getSize(size) {
+
+    const sizePrefix = size !== 0
+        ? Math.floor(Math.log(size) / Math.log(1024))
+        : 0
+        
+    const sizes = [
+        'Bytes',
+        'KB',
+        'MB',
+        'GB',
+        'TB',
+        'PT'
+    ]
+
+    console.log(size / Math.pow(1024, sizePrefix))
+
+    return sizes.indexOf(sizes[sizePrefix]) === -1
+        ? 'Unkown'
+        : parseFloat(size / Math.pow(1024, sizePrefix)) + sizes[sizePrefix]
+    
+}

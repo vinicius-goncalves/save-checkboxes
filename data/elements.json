@@ -1,0 +1,10 @@
+[
+    {
+        "CHECKBOX_MANAGER_FILE": {
+            "script": {
+                "src": "js/checkbox-maneger.js",
+                "type": "module"
+            }
+        }
+    }
+]
