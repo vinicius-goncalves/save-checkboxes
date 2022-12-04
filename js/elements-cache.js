@@ -1,4 +1,5 @@
 import elements from '../data/elements.json' assert { type: 'json' }
+export { Elements }
 
 function Elements() {
     
@@ -30,12 +31,39 @@ function Elements() {
 
     this.getElementsIntoCache = async function() {
         
+        const request = getCacheMatchArgs('request')
         const cache = await startCache()
-        const foundCache = await cache.match(`${window.origin}/data/elements.json`)
-        if(foundCache) {
-            foundCache.json().then(data => {
-                console.log(data)
-            })
+        const cacheFound = await cache.match(request)
+        
+        //If this happened, this means elements don't not exist into caches
+        if(!cacheFound) {
+            
+            const response = getCacheMatchArgs('response')
+            
+            try {
+                
+                await cache.put(request, response)
+                console.log('Elements have inserted in cache.')
+
+                const cacheFound = await cache.match(request)
+                const elsDeserialized = await cacheFound.json()
+                return elsDeserialized
+
+            } catch (error) {
+                console.log(error)
+            }
+
+            return
         }
+
+        //Now, if this happened, this means the cache was found..
+        //But the there was a problem with the request
+        if(!foundCache.ok || foundCache.status > 300) {
+            throw new Error('There was a problem with cache elements request...')
+        }
+
+        const elsIntoCache = await foundCache.json()
+        return elsIntoCache
+
     }
 }
