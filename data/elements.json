@@ -1,10 +1,23 @@
-[
-    {
-        "CHECKBOX_MANAGER_FILE": {
-            "script": {
-                "src": "js/checkbox-maneger.js",
-                "type": "module"
-            }
+{
+    "CHECKBOX_MANAGER_FILE": {
+        "script": {
+            "src": "./js/checkbox-manager.js",
+            "type": "module"
+        }
+    },
+    "CHECKBOX_WRAPPER": {
+        "label": {
+            "class": "checkbox-wrapper"
+        }
+    },
+    "INPUT_CHECKBOX": {  
+        "input": {
+            "type": "checkbox"
+        }
+    },
+    "SPAN_CHECKBOX": {
+        "span": {
+            "class": "checkbox-span"
         }
     }
-]
+}

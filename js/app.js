@@ -1,4 +1,5 @@
 import { Checkbox, CheckboxManager, CheckboxDataCache, CheckboxCreator } from './checkbox-manager.js'
+import { Elements } from './elements-cache.js'
 import { randomID, createElement } from './utils.js'
 
 const docBody = document.body
@@ -7,6 +8,7 @@ const addCheckboxButton = document.querySelector('.add-checkbox')
 
 const checkboxManager = new CheckboxManager()
 const checkboxDataCache = new CheckboxDataCache()
+const elements = new Elements()
 
 function initializeMutationObserver() {
     
@@ -19,49 +21,53 @@ function initializeMutationObserver() {
     })
 }
 
+async function createCheckboxes(els) {
+
+    const checkboxes = await checkboxDataCache.getAllCheckboxes()
+    checkboxes.forEach(checkbox => {
+
+        const { id } = checkbox
+
+        const label = createElement(els.CHECKBOX_WRAPPER)
+        label.setAttribute('data-id', id)
+        
+        const input = createElement(els.INPUT_CHECKBOX)
+
+        const span = createElement(els.SPAN_CHECKBOX)
+        const txtContent = document.createTextNode(id)
+        
+        span.appendChild(txtContent)
+        label.append(input, span)
+
+        mainCheckboxes.appendChild(label)
+
+    })
+
+    checkboxManager.getAllItems(items => {
+        items.forEach(item => {
+            document.querySelector(`[data-id="${item.id}"]`).querySelector('input').setAttribute('checked', 'true')
+        })
+    })
+}
+
+async function handleWithInitialElements() {
+
+    const els = await elements.getElementsIntoCache()
+
+    const script = createElement(els.CHECKBOX_MANAGER_FILE)
+    docBody.insertAdjacentElement('beforeend', script)
+
+    createCheckboxes(els)
+
+    initializeMutationObserver()
+
+}
+
+
 window.addEventListener('DOMContentLoaded', () => {
     
-    initializeMutationObserver()
-    
-    const s = createElement({
-        script: {
-            src: 'js/checkbox-manager.js',
-            type: 'module'
-        }
-    })
-    
-    docBody.insertAdjacentElement('beforeend', s)
-
-    checkboxDataCache.getAllCheckboxes(checkboxes => {
-        checkboxes.forEach(checkbox => {
-            
-            const { id } = checkbox
-            
-            const label = document.createElement('label')
-            label.setAttribute('class', 'checkbox-wrapper')
-            label.setAttribute('data-id', String(id))
-
-            
-            const input = document.createElement('input')
-            input.setAttribute('type', 'checkbox')
-            
-            const span = document.createElement('span')
-            const txtContent = document.createTextNode(id)
-            span.setAttribute('class', 'checkbox-span')
-            
-            span.appendChild(txtContent)
-            label.append(input, span)
-
-            mainCheckboxes.appendChild(label)
-
-        })
-
-        checkboxManager.getAllItems(items => {
-            items.forEach(item => {
-                document.querySelector(`[data-id="${item.id}"]`).querySelector('input').setAttribute('checked', 'true')
-            })
-        })
-    })
+    handleWithInitialElements()
+        
 })
 
 addCheckboxButton.addEventListener('click', async () => {

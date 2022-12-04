@@ -170,7 +170,7 @@ function CheckboxDataCache() {
         } while(!CheckboxDataCache.globalFlag)
     }
 
-    this.getAllCheckboxes = async function(callback) {
+    this.getAllCheckboxes = async function() {
         
         try {
 
@@ -178,10 +178,10 @@ function CheckboxDataCache() {
             const allMatches = await cache.matchAll()
             const promises = allMatches.map(responseObj => responseObj.json())
             const promisesResolved = await Promise.all(promises)
-            callback(promisesResolved)
+            return promisesResolved
     
         } catch (error) {
-
+            console.log(error)
         }
     }
 }

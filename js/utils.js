@@ -82,7 +82,7 @@ const obj = {
 }
 
 export function createElement(elementObj) {
-    
+
     const elementToCreate = Object.keys(elementObj)[0]
     const elementAttributes = Object.values(elementObj)[0]
 
