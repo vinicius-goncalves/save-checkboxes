@@ -10,17 +10,6 @@ const checkboxManager = new CheckboxManager()
 const checkboxDataCache = new CheckboxDataCache()
 const elements = new Elements()
 
-function initializeMutationObserver() {
-    
-    const mutation = new MutationObserver(mutations => {
-        // console.log(mutations)
-    })
-
-    mutation.observe(mainCheckboxes, {
-        childList: true,
-    })
-}
-
 async function createCheckboxes(els) {
 
     const checkboxes = await checkboxDataCache.getAllCheckboxes()
@@ -59,10 +48,7 @@ async function handleWithInitialElements() {
 
     createCheckboxes(els)
 
-    initializeMutationObserver()
-
 }
-
 
 window.addEventListener('DOMContentLoaded', () => {
     
@@ -130,8 +116,14 @@ mainCheckboxes.addEventListener('click', (event) => {
 })
 
 window.addEventListener('resize', () => {
+    
     if(document.documentElement.clientWidth < 401) {
-        console.log('Use mouse swap feature...')
+        document.querySelector('.information-content').classList.add('active')
+        setTimeout(() => {
+            document.querySelector('.information-content').classList.remove('active')
+        }, 3500)
+    } else {
+        document.querySelector('.information-content').classList.remove('active')
     }
 })
 
