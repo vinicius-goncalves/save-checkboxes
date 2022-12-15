@@ -26,13 +26,12 @@ const dbPromise = new Promise(resolve => {
     })
 })
 
-function makeTransaction(objectStore, callback, readMode = 'readonly') {
+async function makeTransaction(objectStore, callback, readMode = 'readonly') {
     
     dbPromise.then(db => {
         const transaction = db.transaction(objectStore, readMode)
         const store = transaction.objectStore(objectStore)
         callback(store)
-
     })
 }
 
@@ -62,7 +61,8 @@ function CheckboxManager () {
     this.saveCheckbox = function saveCheckbox(checkboxObj) {
 
         makeTransaction(OBJECT_STORE_NAME, store => {
-            store.put(checkboxObj).addEventListener('success', () => {
+            const query = store.put(checkboxObj)
+            query.addEventListener('success', () => {
                 this.getCheckbox(checkboxObj.id, checkboxAdded => {
                     return checkboxAdded
                 })
@@ -70,7 +70,7 @@ function CheckboxManager () {
         }, 'readwrite')
     }
 
-    this.getAllItems = function(callback) {
+    this.getAllItems = function getAllItems(callback) {
         makeTransaction(OBJECT_STORE_NAME, store => {
             store.getAll().addEventListener('success', (event) => {
                 callback(event.target.result)
@@ -106,7 +106,7 @@ function CheckboxManager () {
 function CheckboxDataCache() {
 
     CheckboxDataCache.globalFlag = false
-    CheckboxDataCache.loopAttemps = 0
+    CheckboxDataCache.loopAttempts = 0
 
     function requestLink(id) { 
         return `${window.origin}/checkboxes/${String(id)}.json`
@@ -157,15 +157,15 @@ function CheckboxDataCache() {
                 }
             }
 
-            if(CheckboxDataCache.loopAttemps > getFactorial(CheckboxDataCache.currentID.length) || CheckboxDataCache.loopAttemps > Number.MAX_SAFE_INTEGER) {
-                console.log('The attemps was filled up, breaked')
+            if(CheckboxDataCache.loopAttempts > getFactorial(CheckboxDataCache.currentID.length) || CheckboxDataCache.loopAttempts > Number.MAX_SAFE_INTEGER) {
+                console.log('The attempts was filled up, the loop was broke')
                 break
             }
             
             console.log(`An checkbox with ID ${CheckboxDataCache.currentID} already exists`)
             CheckboxDataCache.currentID = randomID(6)
             CheckboxDataCache.globalFlag = false
-            CheckboxDataCache.loopAttemps++
+            CheckboxDataCache.loopAttempts++
 
         } while(!CheckboxDataCache.globalFlag)
     }

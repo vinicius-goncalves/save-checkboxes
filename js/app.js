@@ -167,8 +167,8 @@ window.addEventListener('mouseup', () => {
 mainCheckboxes.addEventListener('scroll', () => {
     
     const scrollTop = mainCheckboxes.scrollTop || 0
-    const clientHeight = mainCheckboxes.scrollHeight - mainCheckboxes.clientHeight
-    const percentage = (scrollTop / clientHeight) * 100
+    const maxClientHeightScroll = mainCheckboxes.scrollHeight - mainCheckboxes.clientHeight
+    const percentage = (scrollTop / maxClientHeightScroll) * 100
     document.querySelector('.scrollbar-content').style.width = `${percentage}%`
 
 })
