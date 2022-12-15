@@ -51,7 +51,6 @@ async function handleWithInitialElements() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    
     handleWithInitialElements()
         
 })
@@ -133,6 +132,7 @@ let prevScrollTop = 0
 
 mainCheckboxes.addEventListener('mousedown', (event) => {
     
+    
     if(!isSwapping) {
 
         document.documentElement.style.setProperty('user-select', 'none')
@@ -148,6 +148,7 @@ mainCheckboxes.addEventListener('mousedown', (event) => {
 
 window.addEventListener('mousemove', (event) => {
     if(isSwapping) {
+        mainCheckboxes.style.setProperty('pointer-events', 'none')
         mainCheckboxes.scrollTop = prevScrollTop - (event.clientY - coordY)
         return
     }
@@ -158,7 +159,7 @@ window.addEventListener('mouseup', () => {
         
         isSwapping = false
         document.documentElement.style.removeProperty('user-select')
-
+        mainCheckboxes.style.setProperty('pointer-events', 'all')
         return
     }
 })
@@ -167,7 +168,7 @@ mainCheckboxes.addEventListener('scroll', () => {
     
     const scrollTop = mainCheckboxes.scrollTop || 0
     const clientHeight = mainCheckboxes.scrollHeight - mainCheckboxes.clientHeight
-    const percetange = (scrollTop / clientHeight) * 100
-    document.querySelector('.scrollbar-content').style.width = `${percetange}%`
+    const percentage = (scrollTop / clientHeight) * 100
+    document.querySelector('.scrollbar-content').style.width = `${percentage}%`
 
 })

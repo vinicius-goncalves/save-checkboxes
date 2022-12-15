@@ -40,17 +40,6 @@ function randomID(len) {
 
 }
 
-function randomUUID() {
-    
-    let dateTime = Date.now()
-    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
-        const random = Math.floor(Math.random() * 16) % 16 | 0
-        dateTime = dateTime / 16
-        return (char === 'x' ? random : (random & 0x3 | 0x8)).toString(16)  
-    })
-    return uuid
-}
-
 function getFactorial(number) {
     if(number !== 1) {
         return getFactorial(number - 1) * number
