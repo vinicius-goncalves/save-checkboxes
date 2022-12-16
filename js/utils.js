@@ -1,4 +1,4 @@
-export { randomID, getFactorial }
+export { randomID, getFactorial, createElement }
 
 function getChar(type) {
 
@@ -50,12 +50,8 @@ function getFactorial(number) {
 /** 
 * Create a new DOM element
 * @param {object} elementObj - An object with the element details 
-*
-*
-*
-*/
-
-const obj = {
+* 
+var obj = {
     div: {
         width: '325px',
         height: '325px',
@@ -69,8 +65,8 @@ const obj = {
         }
     }
 }
-
-export function createElement(elementObj) {
+*/
+function createElement(elementObj) {
 
     const elementToCreate = Object.keys(elementObj)[0]
     const elementAttributes = Object.values(elementObj)[0]
@@ -104,13 +100,11 @@ function getSize(size) {
         'MB',
         'GB',
         'TB',
-        'PT'
+        'PB'
     ]
 
-    console.log(size / Math.pow(1024, sizePrefix))
-
     return sizes.indexOf(sizes[sizePrefix]) === -1
-        ? 'Unkown'
+        ? 'Unknown'
         : parseFloat(size / Math.pow(1024, sizePrefix)) + sizes[sizePrefix]
     
 }

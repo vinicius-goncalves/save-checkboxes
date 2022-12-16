@@ -13,6 +13,7 @@ const elements = new Elements()
 async function createCheckboxes(els) {
 
     const checkboxes = await checkboxDataCache.getAllCheckboxes()
+
     checkboxes.forEach(checkbox => {
 
         const { id } = checkbox
@@ -32,10 +33,28 @@ async function createCheckboxes(els) {
 
     })
 
-    checkboxManager.getAllItems(items => {
-        items.forEach(item => {
-            document.querySelector(`[data-id="${item.id}"]`).querySelector('input').setAttribute('checked', 'true')
+    async function loadCheckboxesChecked() {
+
+        const checkboxesChecked = await checkboxManager.getAllItems()
+        if(!Array.isArray(checkboxesChecked)) {
+            return
+        }
+
+        checkboxesChecked.forEach(item => {
+
+            const { id } = item
+            const itemWrapper = document.querySelector(`[data-id="${id}"]`)
+            const inputElement = itemWrapper.querySelector('input')
+
+            const checkedAttr = document.createAttribute('checked')
+            checkedAttr.value = 'true'
+
+            inputElement.setAttributeNode(checkedAttr)
         })
+    } 
+
+    requestIdleCallback(() => {
+        loadCheckboxesChecked()
     })
 }
 
@@ -83,7 +102,7 @@ addCheckboxButton.addEventListener('click', async () => {
 
 })
 
-mainCheckboxes.addEventListener('click', (event) => {
+mainCheckboxes.addEventListener('click', async (event) => {
 
     const targetClicked = event.target
     if(targetClicked.type !== 'checkbox') {
@@ -91,27 +110,25 @@ mainCheckboxes.addEventListener('click', (event) => {
     }
 
     const closestDataId = targetClicked.closest('[data-id]')
-    const id = closestDataId.dataset.id
+    const { id } = closestDataId.dataset
     const checkedWhen = Date.now()
 
     const checkbox = new Checkbox(id, checkedWhen)
+    const checkboxFound = await checkboxManager.getCheckbox(id)
 
-    checkboxManager.getCheckbox(id, result => {
-
-        if(typeof result !== 'undefined') {
-            checkboxManager.deleteCheckbox(id)
-            return
-        }
-
-        try {
-            checkboxManager.saveCheckbox(checkbox)
-            console.log(`Saved checkbox with ID "${id}"`)
-        } catch (error) {
-            console.error(error)
-        } finally {
-            console.log('All processes was finished')
-        }
-    })
+    if(typeof checkboxFound !== 'undefined') {
+        checkboxManager.deleteCheckbox(id)
+        return
+    }
+    
+    try {
+        const checkboxAdded = await checkboxManager.saveCheckbox(checkbox)
+        console.log(`Saved checkbox with ID "${id}"`)
+    } catch (error) {
+        console.error(error)
+    } finally {
+        console.log('All processes was finished')
+    }
 })
 
 window.addEventListener('resize', () => {

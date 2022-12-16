@@ -26,12 +26,13 @@ const dbPromise = new Promise(resolve => {
     })
 })
 
-async function makeTransaction(objectStore, callback, readMode = 'readonly') {
+function makeTransaction(objectStore, readMode = 'readonly') {
     
-    dbPromise.then(db => {
+    return new Promise(async (resolve) => {
+        const db = await dbPromise
         const transaction = db.transaction(objectStore, readMode)
         const store = transaction.objectStore(objectStore)
-        callback(store)
+        resolve(store)
     })
 }
 
@@ -47,39 +48,46 @@ function CheckboxCreator(id) {
 
 function CheckboxManager () {
 
-    this.getCheckbox = function getCheckbox(id, callback) {
+    this.getCheckbox = async function getCheckbox(id) {
 
-        makeTransaction(OBJECT_STORE_NAME, store => {
-        
+        return new Promise(async (resolve) => {
+
+            const store = await makeTransaction(OBJECT_STORE_NAME)
             const query = store.get(id)
-            query.addEventListener('success', (event) => {
-                callback(event.target.result)
-            })
+
+            function returnCheckbox(event) {
+                const { result } = event.target
+                resolve(result)
+            }
+
+            query.addEventListener('success', returnCheckbox.bind(this))
+            
         })
     }
 
     this.saveCheckbox = function saveCheckbox(checkboxObj) {
 
-        makeTransaction(OBJECT_STORE_NAME, store => {
+        return new Promise(async (resolve) => {
+            const store = await makeTransaction(OBJECT_STORE_NAME, 'readwrite')
             const query = store.put(checkboxObj)
-            query.addEventListener('success', () => {
-                this.getCheckbox(checkboxObj.id, checkboxAdded => {
-                    return checkboxAdded
-                })
-            })
-        }, 'readwrite')
-    }
-
-    this.getAllItems = function getAllItems(callback) {
-        makeTransaction(OBJECT_STORE_NAME, store => {
-            store.getAll().addEventListener('success', (event) => {
-                callback(event.target.result)
+            query.addEventListener('success', async () => {
+                const checkboxAdded = await this.getCheckbox(checkboxObj.id)
+                resolve(checkboxAdded)
             })
         })
     }
 
-    this.deleteCheckbox = function(id) {
-        makeTransaction(OBJECT_STORE_NAME, store => {
+    this.getAllItems = async function getAllItems() {
+        return new Promise(async (resolve) => {
+            const store = await makeTransaction(OBJECT_STORE_NAME)
+            store.getAll().addEventListener('success', (event) => {
+                resolve(event.target.result)
+            })
+        })
+    }
+
+    this.deleteCheckbox = async function(id) {
+        const store = await makeTransaction(OBJECT_STORE_NAME, 'readwrite')
             
             const openedCursor = store.openCursor()
             openedCursor.addEventListener('success', (event) => {
@@ -97,9 +105,8 @@ function CheckboxManager () {
                 }
 
                 cursor.continue()
-                
-            })
-        }, 'readwrite')
+
+        })
     }
 }
 

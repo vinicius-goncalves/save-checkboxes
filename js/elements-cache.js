@@ -59,7 +59,7 @@ function Elements() {
         //Now, if this happened, this means the cache was found..
         //But the there was a problem with the request
         if(!cacheFound.ok || cacheFound.status > 300) {
-            throw new Error('There was a problem with cache elements request...')
+            throw console.error('There was a problem with cache elements request.')
         }
 
         const elsIntoCache = await cacheFound.json()
