@@ -87,24 +87,3 @@ function createElement(elementObj) {
     
     return el
 }
-
-function getSize(size) {
-
-    const sizePrefix = size !== 0
-        ? Math.floor(Math.log(size) / Math.log(1024))
-        : 0
-        
-    const sizes = [
-        'Bytes',
-        'KB',
-        'MB',
-        'GB',
-        'TB',
-        'PB'
-    ]
-
-    return sizes.indexOf(sizes[sizePrefix]) === -1
-        ? 'Unknown'
-        : parseFloat(size / Math.pow(1024, sizePrefix)) + sizes[sizePrefix]
-    
-}
