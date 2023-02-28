@@ -1,5 +1,5 @@
-import { getFactorial, randomID } from './utils.js'
-export { Checkbox, CheckboxManager }
+import { randomID } from './utils.js'
+export { Checkbox, CheckboxNamed, CheckboxManager }
 
 const STORE_NAME = 'checkboxes'
 const STORE_VERSION = 1
@@ -32,28 +32,39 @@ const dbPromise = new Promise(resolve => {
     })
 })
 
-async function makeTransaction(objectStore, readMode = 'readonly') {
-    const db = await dbPromise
-    const transaction = db.transaction(objectStore, readMode)
-    const store = transaction.objectStore(objectStore)
-    return Promise.resolve(store)
+class Checkbox {
+
+    constructor(id = randomID(6)) {
+        this.id = id
+        this.checkedTimestamp = Date.now()
+    }
 }
 
-function Checkbox(id, checkedTimestamp) {
-    this.id = id
-    this.checkedTimestamp = checkedTimestamp
+class CheckboxNamed extends Checkbox {
+    constructor(id, name) {
+        super(id)
+        this.name = name
+    }
 }
 
 class CheckboxManager {
 
+    #storeName
+
     constructor(storeName) {
-        this.storeName = storeName
+        this.#storeName = storeName
     }
 
-    async get(id) {
+    async #makeTransaction(objectStore, readMode = 'readonly') {
+        const db = await dbPromise
+        const transaction = db.transaction(objectStore, readMode)
+        const store = transaction.objectStore(objectStore)
+        return Promise.resolve(store)
+    }
 
-        const store = await makeTransaction(this.storeName, 'readonly')
-        
+    async search(id) {
+
+        const store = await this.#makeTransaction(this.#storeName, 'readonly')
         const key = IDBKeyRange.only(id)
         const cursorOpened = store.openCursor(key)
 
@@ -62,21 +73,32 @@ class CheckboxManager {
             cursorOpened.addEventListener('success', (event) => {
             
                 const { ['result']: cursor } = event.target
-                resolve(cursor ? cursor.value : "The query didn't return any values")
+
+                const resolveObj = cursor 
+                    ? { found: true, value: cursor.value } 
+                    : { found: false, message: "The query didn't return any values.", searchedId: id }
+
+                resolve(resolveObj)
     
             })
         })
     }
 
-    set(checkboxInstance) {
+    async bulkSearch(...ids) {
+        return Promise.all(ids.map(async (id) => (await this.search(id))))
+    }
+
+    add(checkboxInstance) {
 
         return new Promise(async (resolve) => {
 
+            const { id } = checkboxInstance
 
-            const store = await makeTransaction(this.storeName, 'readwrite')
-            const query = store.put(checkboxInstance)
+            const store = await this.#makeTransaction(this.#storeName, 'readwrite')
+            const query = store.add(checkboxInstance)
             
             query.onsuccess = () => resolve(this)
+            query.onerror = () => console.error(`It was not possible to add the checkbox with the ID ${id}.`)
 
         })
     }
@@ -85,7 +107,7 @@ class CheckboxManager {
 
         return new Promise(async (resolve) => {
 
-            const store = await makeTransaction(this.storeName)
+            const store = await this.#makeTransaction(this.#storeName)
             const query = store.getAll()
 
             query.addEventListener('success', (event) => {
@@ -99,130 +121,26 @@ class CheckboxManager {
         })
     }
 
-    async deleteCheckbox(id) {
+    async delete(id) {
 
-        if(typeof id === 'undefined') {
-            console.error('The ID for delete a checkbox is undefined.')
-            return
-        }
+        if(id === undefined) console.error("The ID's checkbox must not be empty.")
 
-        const store = await makeTransaction(storeName, 'readwrite')
-        const openedCursor = store.openCursor()
+        const store = await this.#makeTransaction(this.#storeName, 'readwrite')
+        const key = IDBKeyRange.only(id)
+        const openedCursor = store.openCursor(key)
 
-        function deleteCheckboxFunc(event) {
-            const cursor = event.target.result
-            if(!cursor) {
-                return console.log('Finished')
-            }
+        openedCursor.addEventListener('success', (event) => {
             
-            if(cursor.value.id != id) {
-                cursor.continue()
+            const { ['result']: cursor } = event.target
+    
+            if(!cursor) {
+                console.warn(`The checkbox with the ID "${id}" doesn't exist.`)
                 return
             }
-
+    
             const deleteResult = cursor.delete()
-            deleteResult.addEventListener('success', () => {
-                console.info(`[!!] Checkbox "${id}" was deleted.`)
-                return
-            })
-        }
-        
-        openedCursor.addEventListener('success', deleteCheckboxFunc.bind(this))
+            deleteResult.onsuccess = () => console.info(`[!!] Checkbox "${id}" was deleted.`)
+
+        })
     }
 }
-
-const allCheckboxes = new CheckboxManager('all-checkboxes')
-allCheckboxes.get(0.115772546617215303).then(r => console.log(r))
-
-// function CheckboxDataCache() {
-
-//     CheckboxDataCache.globalFlag = false
-//     CheckboxDataCache.loopAttempts = 0
-
-//     function reqURL(id) {
-//         const url = new URL(`${window.origin}/checkboxes/${id}.json`)
-//         return url
-//     }
-
-//     this.startCache = async function() {
-//         const cache = await caches.open('checkboxes')
-//         return cache
-//     }
-    
-//     this.findCheckbox = async function(id) {
-
-//         const cache = await this.startCache()
-
-//         const req = new Request(reqURL(id))
-//         const cacheMatched = await cache.match(req)
-
-//         if(!cacheMatched || !cacheMatched.ok) { 
-//             return 
-//         }
-
-//         const checkboxObject = await cacheMatched.json()
-//         return checkboxObject
-//     }
-    
-//     this.putCheckbox = async function(checkboxObj) {
-        
-//         CheckboxDataCache.currentID = checkboxObj.id
-        
-//         do {
-
-//             const cacheFound = await this.findCheckbox(CheckboxDataCache.currentID)
-
-//             if(!cacheFound) {
-
-//                 const cache = await this.startCache()
-
-//                 const hds = new Headers({
-//                     'Content-Type': 'application/json',
-//                     'Content-Length': JSON.stringify(checkboxObj).length / 1024
-//                 })
-
-//                 const request = new Request(reqURL(CheckboxDataCache.currentID), { headers: hds } )
-//                 const response = new Response(JSON.stringify(checkboxObj), { 
-//                     headers: hds,
-//                     status: 200,
-//                     statusText: 'Ok'
-//                 })
-
-//                 CheckboxDataCache.globalFlag = true
-//                 await cache.put(request, response)
-
-//                 return {
-//                     created: true,
-//                     identify: CheckboxDataCache.currentID,
-//                     finishedWhen: Date.now()
-//                 }
-//             }
-
-//             if(CheckboxDataCache.loopAttempts > getFactorial(CheckboxDataCache.currentID.length) || CheckboxDataCache.loopAttempts > Number.MAX_SAFE_INTEGER) {
-//                 console.log('The attempts were filled up, the loop was broke')
-//                 break
-//             }
-            
-//             console.log(`An checkbox with ID ${CheckboxDataCache.currentID} already exists`)
-//             CheckboxDataCache.currentID = randomID(6)
-//             CheckboxDataCache.globalFlag = false
-//             CheckboxDataCache.loopAttempts++
-
-//         } while(!CheckboxDataCache.globalFlag)
-//     }
-
-//     this.getAllCheckboxes = async function() {
-        
-//         try {
-
-//             const cache = await this.startCache()
-//             const allMatches = await cache.matchAll()
-//             const promises = allMatches.map(responseObj => responseObj.json())
-//             const promisesResolved = await Promise.all(promises)
-//             return promisesResolved
-    
-//         } catch (error) {
-//             console.error(error)
-//         }
-//     }
-// }

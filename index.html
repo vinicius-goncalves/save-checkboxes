@@ -1,43 +1,40 @@
 <!DOCTYPE html>
 <html>
+
     <head>
         <title>Save Checkboxes</title>
         <link rel="stylesheet" href="style.css" type="text/css">
         <link rel="shortcut icon" href="data/favicon.png" type="image/x-icon">
+        <meta charset="UTF-8">
+        <meta name="author" content="github@vinicius-goncalves.com">
+        <meta name="robots" content="follow, index">
+        <meta name="keywords" content="checkboxes, checkbox">
     </head>
+
     <body>
+
         <div class="information-wrapper">
             <div class="information-content">
                 <span>Use mouse swap feature to move checkbox list...</span>
             </div>
         </div>
+
         <div class="scrollbar">
             <div class="scrollbar-content"></div>
         </div>
+
         <header>
             <h1>Save Checkboxes</h1>
-            <input type="button" class="add-checkbox" value="New checkbox">
+            <input type="button" class="new-checkbox" value="New checkbox">
         </header>
-        <div class="main-checkboxes">
-            <div class="checkboxes">
-                <label class="checkbox-wrapper" data-id="1">
-                    <input type="checkbox">
-                    <span class="checkbox-span">Check me!</span>
-                </label>
-                <label class="checkbox-wrapper" data-id="2">
-                    <input type="checkbox">
-                    <span class="checkbox-span">Check me too!</span>
-                </label>
-                <label class="checkbox-wrapper" data-id="3">
-                    <input type="checkbox">
-                    <span class="checkbox-span">Hey! Don't forget me...</span>
-                </label>
-            </div>
-        </div>
+        
+        <main class="main-checkboxes">
+            <div class="checkboxes"></div>
+        </main>
+
         <footer>For more projects, go to <a href="https://github.com/vinicius-goncalves" target="_blank" rel="external">Vinícius Gonçalves' Github</a></footer>
+        
         <script src="js/app.js" type="module"></script>
-        <script src="js/utils.js" type="module"></script>
-        <script src="js/elements-cache.js" type="module"></script>
-        <script src="js/checkbox-manager.js" type="module"></script>
+
     </body>
 </html>

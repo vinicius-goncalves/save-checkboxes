@@ -1,89 +1,34 @@
-export { randomID, getFactorial, createElement }
+export { randomID, createElement }
 
-function getChar(type) {
+const randomLetter = () => String.fromCharCode(Math.floor((Math.random() * 26) + 65))
 
-    let char = null
+function randomID(length) {
+
+    const newArr = Array.from({ length }).fill(undefined)
     
-    switch(type) {
-        case 'letters':
-            char = Math.floor(Math.random() * 26) + 97
-            break
-        case 'numbers':
-            char = Math.floor(Math.random() * (9 - 0) + 0)
-            break
-        default:
-            break
+    const mapCallback = () => {
+        const letter = randomLetter()
+        return Math.random() > .5 ? letter.toLowerCase() : letter
     }
 
-    return char
+    const randomArrLetters = newArr.map(mapCallback)
+
+    return randomArrLetters.join('')
 }
 
-function randomID(len) {
-    
-    const charsType = ['letters', 'numbers']
+function createElement(newElement) {
 
-    const chars = Array.from({ length: len }).fill(undefined).map(() => {
-        
-        const randomType = charsType[Math.floor(Math.random() * charsType.length)]
-        const randomChar = getChar(randomType)
-        const fixedChar = randomChar >= 10 ? String.fromCharCode(randomChar) : randomChar
-        return fixedChar
+    const newFragment = document.createDocumentFragment()
+
+    const [ element, attributes ] = Object.entries(newElement)[0]
+    const DOMElement = document.createElement(element)
+
+    Object.entries(attributes).forEach(([ attr, value ]) => {
+
+        DOMElement.setAttribute(attr, value)
+        newFragment.appendChild(DOMElement)
 
     })
-
-    return chars.map(char => {
-        if(typeof char !== 'number') {
-            return Math.random() > .5 ? char.toUpperCase() : char.toLowerCase()
-        }
-        return char
-    }).join('')
-
-}
-
-function getFactorial(number) {
-    if(number !== 1) {
-        return getFactorial(number - 1) * number
-    }
-    return 1
-} 
-
-/** 
-* Create a new DOM element
-* @param {object} elementObj - An object with the element details 
-* 
-var obj = {
-    div: {
-        width: '325px',
-        height: '325px',
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        'z-index': 25,
-        style: {
-            backgroundColor: '#ff00ff',
-            color: '#ffffff'
-        }
-    }
-}
-*/
-function createElement(elementObj) {
-
-    const elementToCreate = Object.keys(elementObj)[0]
-    const elementAttributes = Object.values(elementObj)[0]
-
-    const el = document.createElement(elementToCreate)
-
-    for(let attribute in elementAttributes) {
-        
-        const attributeValue = elementAttributes[attribute]
-        el.setAttribute(attribute, attributeValue)
-        
-        if(attribute.indexOf('style') >= 0) {
-            for(let styleProperty in attributeValue) {
-                el.style.setProperty(styleProperty, attributeValue[styleProperty])
-            }
-        }
-    }
     
-    return el
+    return DOMElement
 }
